@@ -1,7 +1,7 @@
 # PhoenixHelpers
 
-**TODO: Add description**
-
+A collection of functions I frequently use in my applications dealing with real world data.
+ 
 ## Installation
 
 If [available in Hex](https://hex.pm/docs/publish), the package can be installed as:
@@ -22,3 +22,13 @@ If [available in Hex](https://hex.pm/docs/publish), the package can be installed
     end
     ```
 
+## Usage
+
+
+  1. Import in your modules
+   
+    ```elixir
+    use PhoenixHelpers.ModelHelper
+    
+    
+    ```
