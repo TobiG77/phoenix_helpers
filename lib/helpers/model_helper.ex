@@ -18,11 +18,47 @@ defmodule PhoenixHelpers.ModelHelper do
         key2: bar
     }
     """
-    def atomize_keys(params) when is_map (params)do
+   def atomize_keys(params) when is_map (params)do
         params
-        |> Enum.reduce(%{}, fn ({key, val}, acc) -> Map.put(acc, as_atom(key), val) end)
+        |> Enum.reduce(%{}, fn ({key, val}, acc) ->
+            cond do
+              is_map(val) -> Map.put(acc, as_atom(key), atomize_keys(val))
+              is_bitstring(key) -> Map.put(acc, as_atom(key), val)
+              true -> Map.put(acc,key, val)
+            end
+        end)
     end
     def atomize_keys(params), do: params
+
+    @doc """
+    Convert atom keys of a given map to strings
+    params = %{ foo: "bar" }
+    becomes:
+             %{ "foo"" => "bar" }
+
+    Mixed key format supported
+
+    params = %{
+        "key1" => foo,
+        :key2 => bar
+    }
+    becomes:
+    %{
+        "key1" => foo,
+        "key2" => bar
+    }
+    """
+   def stringify_keys(params) when is_map (params)do
+        params
+        |> Enum.reduce(%{}, fn ({key, val}, acc) ->
+            cond do
+              is_map(val) -> Map.put(acc, as_string(key), stringify_keys(val))
+              is_atom(key) -> Map.put(acc, as_string(key), val)
+              true -> Map.put(acc,key, val)
+            end
+        end)
+    end
+    def stringify_keys(params), do: params
 
     def remove_nil_fields(params) when is_map(params)do
         Enum.map(params, fn({k, v}) -> filter_nil_value({k, v}) end)
@@ -46,5 +82,8 @@ defmodule PhoenixHelpers.ModelHelper do
 
     def list_empty?([]), do: true
     def list_empty?(list) when is_list(list), do: false
+
+    def as_string(key) when is_atom(key), do: Atom.to_string(key)
+    def as_string(key), do: key
 
 end
